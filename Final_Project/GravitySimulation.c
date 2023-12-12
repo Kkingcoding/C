@@ -4,8 +4,8 @@
 #include <conio.h>
 #include <math.h>
 
-#define XPOS 35 // ì½˜ì†” ì°½ì˜ ì¤‘ì•™ì„ ëŒ€ëµì ìœ¼ë¡œ ê°€ì • (ì½˜ì†” ì°½ì˜ ë„ˆë¹„ì— ë”°ë¼ ì¡°ì • í•„ìš”)
-#define MAX_CONSOLE_HEIGHT 60  // ì½˜ì†” ì°½ì˜ ìµœëŒ€ ë†’ì´
+#define XPOS 35 // ÄÜ¼Ö Ã¢ÀÇ Áß¾ÓÀ» ´ë·«ÀûÀ¸·Î °¡Á¤ (ÄÜ¼Ö Ã¢ÀÇ ³Êºñ¿¡ µû¶ó Á¶Á¤ ÇÊ¿ä)
+#define MAX_CONSOLE_HEIGHT 60  // ÄÜ¼Ö Ã¢ÀÇ ÃÖ´ë ³ôÀÌ
 
 void SetConsoleSize(int consoleWidth, int consoleHeight);
 void CursorView(char show);
@@ -16,43 +16,72 @@ int main() {
     SetConsoleSize(70, MAX_CONSOLE_HEIGHT);
 
     float gravity, visualScaleFactor = 0.1;
+    float restitutionCoefficient; // ¹İ¹ß °è¼ö
+
     while (1) {
-        printf("ì¤‘ë ¥ ê°€ì†ë„ë¥¼ ì…ë ¥í•˜ì„¸ìš” (m/s^2): ");
+        printf("¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤\n");
+        printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
+        printf("¦¢\t\t\t Áß·Â°¡¼Óµµ ½Ã¹Ä·¹ÀÌ¼Ç\t\t\t   ¦¢\n");
+        printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
+        printf("¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥\n");
+        printf("\n\tÁß·Â °¡¼Óµµ¸¦ ÀÔ·ÂÇÏ¼¼¿ä (m/s^2): ");
+        
         if (scanf("%f", &gravity) == 1) {
-            break; 
+            printf("\t¹İ¹ß °è¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä (0.0 ~ 1.0): ");
+
+            if (scanf(" %f", &restitutionCoefficient) == 1)
+                break;
+            
+            else {
+                while (getchar() != '\n');
+                printf("¿Ã¹Ù¸¥ ¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä1 (0.0~1.0) \n");
+                Sleep(1000);
+                system("cls");
+            }
         }
         else {
             while (getchar() != '\n');
-            printf("ìˆ«ìë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
+            printf("¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+            Sleep(1500);
+            system("cls");
         }
     }
+
     system("cls");
 
-    int height = 0; // ì´ˆê¸° ë†’ì´ ì„¤ì • (ì½˜ì†” ìƒë‹¨ì—ì„œ ì‹œì‘)
-    float elapsedTime = .01; // ê²½ê³¼ ì‹œê°„ (ì´ˆ)
+    int height = 0; // ÃÊ±â ³ôÀÌ ¼³Á¤ (ÄÜ¼Ö »ó´Ü¿¡¼­ ½ÃÀÛ)
+    float elapsedTime = .01; // °æ°ú ½Ã°£ (ÃÊ)
 
-    CursorView(0); // ì»¤ì„œ ìˆ¨ê¸°ê¸°
+    CursorView(0); // Ä¿¼­ ¼û±â±â
 
     while (height < MAX_CONSOLE_HEIGHT - 2) {
 
         GotoXY(XPOS, height);
-        printf("â—");
+        printf("¡Ü");
         Sleep(elapsedTime);
 
         int sleepTime = (int)(100 / sqrt(gravity * elapsedTime));
         Sleep(sleepTime);
 
-        elapsedTime += .4; // ê²½ê³¼ ì‹œê°„ ì¦ê°€ (ms -> s)
-        height = (int)(0.5 * gravity * pow(elapsedTime, 2) * visualScaleFactor); // ë†’ì´ ê³„ì‚° (h = 0.5 * g * t^2)
+        elapsedTime += .4; // °æ°ú ½Ã°£ Áõ°¡ (ms -> s)
+        height = (int)(0.5 * gravity * pow(elapsedTime, 2) * visualScaleFactor); // ³ôÀÌ °è»ê (h = 0.5 * g * t^2)
 
-        GotoXY(XPOS, height);
-        printf("â—"); // ìƒˆë¡œìš´ ìœ„ì¹˜ì— ê³µ ì¶œë ¥
+        // Ãæµ¹ ÈÄ Æ¨±â´Â ºÎºĞ
+        if (restitutionCoefficient > 0) {
+
+            GotoXY(XPOS, height);
+            printf("¡Ü"); 
+
+            elapsedTime = 0; // ½Ã°£ ÃÊ±âÈ­
+            gravity *= restitutionCoefficient; // ¹İ¹ß °è¼ö Àû¿ë
+        }
+
         system("cls");
     }
 
     GotoXY(XPOS, MAX_CONSOLE_HEIGHT - 1);
-    printf("â—\n");
-    Sleep(1000); // ë§ˆì§€ë§‰ ìœ„ì¹˜ì—ì„œ 1ì´ˆê°„ ëŒ€ê¸°
+    printf("¡Ü\n");
+    Sleep(1000); // ¸¶Áö¸· À§Ä¡¿¡¼­ 1ÃÊ°£ ´ë±â
 
     return 0;
 }
