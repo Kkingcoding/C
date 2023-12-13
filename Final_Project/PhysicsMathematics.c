@@ -1,100 +1,120 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <windows.h>
-#include <conio.h>
 #include <math.h>
+#include "functions.h"
+#include "physics.h"
+#include "graph.h"
 
-#define XPOS 35 // ÄÜ¼Ö Ã¢ÀÇ Áß¾ÓÀ» ´ë·«ÀûÀ¸·Î °¡Á¤ (ÄÜ¼Ö Ã¢ÀÇ ³Êºñ¿¡ µû¶ó Á¶Á¤ ÇÊ¿ä)
-#define MAX_CONSOLE_HEIGHT 60  // ÄÜ¼Ö Ã¢ÀÇ ÃÖ´ë ³ôÀÌ
+#define X_CENTER 35 // ì½˜ì†” ì°½ì˜ ì¤‘ì•™ì„ ëŒ€ëµì ìœ¼ë¡œ ê°€ì • (ì½˜ì†” ì°½ì˜ ë„ˆë¹„ì— ë”°ë¼ ì¡°ì • í•„ìš”)
+#define GRAVITY_CONSOLE_HEIGHT 60  // ì½˜ì†” ì°½ì˜ ìµœëŒ€ ë†’ì´
+#define MAIN_WIDTH 70
+#define MAIN_HEIGHT 40
 
-void SetConsoleSize(int consoleWidth, int consoleHeight);
-void CursorView(char show);
-void PrintCentered(const char* text, int width, int y);
-void GotoXY(int x, int y);
-void ViewGravity() {
-    printf("¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤\n");
-    printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
-    printf("¦¢");
-    PrintCentered("Áß·Â°¡¼Óµµ ½Ã¹Ä·¹ÀÌ¼Ç", 70, 2);
-    GotoXY(67, 2);
-    printf("¦¢\n");
-    printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
-    printf("¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥\n");
-    printf("\n\tÁß·Â °¡¼Óµµ¸¦ ÀÔ·ÂÇÏ¼¼¿ä (m/s^2): ");
+float Velocity = 0; // ê³µì˜ ì´ˆê¸°ì†ë„ëŠ” 0
+float visualScaleFactor = 0.1; // í™”ë©´ì— ì‹¤ì œ ê³µì´ ë–¨ì–´ì§€ëŠ” ë–¨ì–´ì§€ëŠ” ë“¯í•œ ì†ë„ë¥¼ êµ¬í˜„í•˜ê¸° ìœ„í•´ ë°°ìœ¨ ì¡°ì ˆ
+
+void MainMenu() {
+    // 0ë²ˆì§¸ ì¤„
+    printf("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n");
+    // 1ë²ˆì§¸ ì¤„ 
+    printf("â”‚");
+    GotoXY(68, 1);
+    printf("â”‚\n");
+    // 2ë²ˆì§¸ ì¤„
+    printf("â”‚");
+    PrintCentered("Welcome to", MAIN_WIDTH, 2);
+    GotoXY(MAIN_WIDTH - 2, 2);
+    printf("â”‚\n");
+    // 3ë²ˆì§¸ ì¤„
+    printf("â”‚");
+    GotoXY(MAIN_WIDTH - 2, 3);
+    printf("â”‚\n");
+    // 4ë²ˆì§¸ ì¤„
+    printf("â”‚");
+    PrintCentered("â˜… Physics & Mathematics Elxploration â˜…", MAIN_WIDTH, 4);
+    GotoXY(MAIN_WIDTH - 2, 4);
+    printf("â”‚\n");
+    // 5ë²ˆì§¸ ì¤„
+    printf("â”‚");
+    GotoXY(68, 5);
+    printf("â”‚\n");
+    // 6ë²ˆì§¸ ì¤„       
+    printf("â”‚\t\t\t  1. ì¤‘ë ¥ ì‹œë®¬ë ˆì´ì…˜");
+    GotoXY(68, 6);
+    printf("â”‚\n");
+    // 7ë²ˆì§¸ ì¤„
+    printf("â”‚\t\t\t  2. ê·¸ë˜í”„ ê·¸ë¦¬ê¸°");
+    GotoXY(68, 7);
+    printf("â”‚\n");
+    // 8ë²ˆì§¸ ì¤„
+    printf("â”‚\t\t\t  0. í”„ë¡œê·¸ë¨ ì¢…ë£Œ");
+    GotoXY(68, 8);
+    printf("â”‚\n");
+    // 9ë²ˆì§¸ ì¤„
+    printf("â”‚");
+    GotoXY(68, 9);
+    printf("â”‚\n");
+    //10ë²ˆì§¸ ì¤„
+    printf("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n");
 };
-
-float evaluateExpression(float x, char* expression);
-
-void GravitySimulation();
-void GraphPlotting();
+void ExceptionHandling(int line);
 
 int main() {
-    SetConsoleSize(80, 40);
+    SetConsoleSize(MAIN_WIDTH, MAIN_HEIGHT);
+    int choice = -1;
 
-    while (1) {
-        
+    do {
+        MainMenu();
 
-        int choice;
-        printf("\n¸Ş´º¸¦ ¼±ÅÃÇÏ¼¼¿ä (1 ¶Ç´Â 2): ");
-        if (scanf("%d", &choice) == 1) {
-            switch (choice) {
-            case 1:
-                GravitySimulation();
-                break;
-            case 2:
-                GraphPlotting();
-                break;
-            default:
-                printf("Àß¸øµÈ ¸Ş´º ¼±ÅÃÀÔ´Ï´Ù. ´Ù½Ã ¼±ÅÃÇÏ¼¼¿ä.\n");
-                break;
-            }
+        PrintCentered("ë©”ë‰´ë¥¼ ì„ íƒí•˜ì„¸ìš”: ", MAIN_WIDTH, 12);
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 0:
+            break;
+        case 1:
+            PhysicsEngine();
+            break;
+        case 2:
+            GraphPlotting();
+            break;
+        default:
+            ExceptionHandling(15); //ì˜ëª»ëœ ë©”ë‰´ ì„ íƒ ì˜ˆì™¸ ì²˜ë¦¬
+            break;
         }
-        else {
-            while (getchar() != '\n');
-            printf("¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
-            Sleep(1500);
-            system("cls");
-        }
-    }
+    } while (choice != 0);
 
+    PrintCentered("ì´ìš©í•´ ì£¼ì…”ì„œ ê°ì‚¬í•©ë‹ˆë‹¤.\n", MAIN_WIDTH, 14);
     return 0;
 }
 
-void GravitySimulation() {
-    ViewGravity();
+void PhysicsEngine() {
 
-    SetConsoleSize(70, MAX_CONSOLE_HEIGHT);
+    SetConsoleSize(70, GRAVITY_CONSOLE_HEIGHT);
 
-    float gravity, visualScaleFactor = 0.1;
-    float restitutionCoefficient; // ¹İ¹ß °è¼ö
+    float gravity = 1;
+    float restitution = 0; // ë°˜ë°œ ê³„ìˆ˜
 
-    while (1) {
-        printf("¦£¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¤\n");
-        printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
-        printf("¦¢");
-        PrintCentered("Áß·Â°¡¼Óµµ ½Ã¹Ä·¹ÀÌ¼Ç", 70, 2);
-        GotoXY(67, 2);
-        printf("¦¢\n");
-        printf("¦¢\t\t\t\t\t\t\t\t   ¦¢\n");
-        printf("¦¦¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¥\n");
-        printf("\n\tÁß·Â °¡¼Óµµ¸¦ ÀÔ·ÂÇÏ¼¼¿ä (m/s^2): ");
+    while (1) { // ì‚¬ìš©ìê°€ ë°ì´í„° ì…ë ¥
+        ViewPhysicsMain();
 
         if (scanf("%f", &gravity) == 1) {
-            printf("\t¹İ¹ß °è¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä (0.0 ~ 1.0): ");
+            printf("\të°˜ë°œ ê³„ìˆ˜ë¥¼ ì…ë ¥í•˜ì„¸ìš” (0.0 ~ 1.0): ");
 
-            if (scanf(" %f", &restitutionCoefficient) == 1)
+            if (scanf("%f", &restitution) == 1 && restitution >= 0.0 && restitution <= 1.0) {
                 break;
-
+            }
             else {
                 while (getchar() != '\n');
-                printf("¿Ã¹Ù¸¥ ¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä1 (0.0~1.0) \n");
+                ExceptionHandling(15);
                 Sleep(1000);
                 system("cls");
             }
         }
         else {
             while (getchar() != '\n');
-            printf("¼ıÀÚ¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+            ExceptionHandling(15);
             Sleep(1500);
             system("cls");
         }
@@ -102,69 +122,101 @@ void GravitySimulation() {
 
     system("cls");
 
-    int height = 0; // ÃÊ±â ³ôÀÌ ¼³Á¤ (ÄÜ¼Ö »ó´Ü¿¡¼­ ½ÃÀÛ)
-    float elapsedTime = .01; // °æ°ú ½Ã°£ (ÃÊ)
+    int height = 0; // ì´ˆê¸° ë†’ì´ ì„¤ì • (ì½˜ì†” ìƒë‹¨ì—ì„œ ì‹œì‘)
+    float elapsedTime = .01; // ê²½ê³¼ ì‹œê°„ (ì´ˆ)
 
-    CursorView(0); // Ä¿¼­ ¼û±â±â
+    CursorView(0); // ì»¤ì„œ ìˆ¨ê¸°ê¸°
 
-    while (height < MAX_CONSOLE_HEIGHT - 2) {
+    SimulateGravity(gravity);
+    SimulateBouncing(gravity, restitution);
 
-        GotoXY(XPOS, height);
-        printf("¡Ü");
-        Sleep(elapsedTime);
+}
 
-        int sleepTime = (int)(100 / sqrt(gravity * elapsedTime));
-        Sleep(sleepTime);
+void ViewPhysicsMain() {
+    printf("â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\n");
 
-        elapsedTime += .4; // °æ°ú ½Ã°£ Áõ°¡ (ms -> s)
-        height = (int)(0.5 * gravity * pow(elapsedTime, 2) * visualScaleFactor); // ³ôÀÌ °è»ê (h = 0.5 * g * t^2)
+    printf("â”‚");
+    GotoXY(MAIN_WIDTH - 2, 1);
+    printf("â”‚\n");
 
-        // Ãæµ¹ ÈÄ Æ¨±â´Â ºÎºĞ
-        if (restitutionCoefficient > 0) {
+    printf("â”‚");
+    PrintCentered("ì¤‘ë ¥ê°€ì†ë„ ì‹œë®¬ë ˆì´ì…˜", MAIN_WIDTH, 2);
+    GotoXY(MAIN_WIDTH - 2, 2);
+    printf("â”‚\n");
 
-            GotoXY(XPOS, height);
-            printf("¡Ü");
+    printf("â”‚");
+    GotoXY(MAIN_WIDTH - 2, 3);
+    printf("â”‚\n");
+    printf("â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\n");
+    printf("\n\tì¤‘ë ¥ ê°€ì†ë„ë¥¼ ì…ë ¥í•˜ì„¸ìš” (m/s^2): ");
+}
 
-            elapsedTime = 0; // ½Ã°£ ÃÊ±âÈ­
-            gravity *= restitutionCoefficient; // ¹İ¹ß °è¼ö Àû¿ë
+void SimulateGravity(float gravity) {
+    int height = 0;
+    float elapsedTime = 0.4; // ì´ˆê¸° ê²½ê³¼ ì‹œê°„ (ms -> s)
+    
+    while (height < GRAVITY_CONSOLE_HEIGHT - 2) {
+        GotoXY(X_CENTER, height);
+        printf("â—");
+        Sleep((int)(100 / sqrtf(gravity * elapsedTime))); // ê³µì´ ë–¨ì–´ì§€ë©´ì„œ ê³µì˜ ì¶œë ¥ ì‹œê°„ ì¤„ì–´ë“¦
+
+        Velocity += gravity * elapsedTime; // ì†ë„ ê°±ì‹ 
+        height = (int)(0.5 * gravity * powf(elapsedTime, 2) * visualScaleFactor); // ê³µì˜ ë†’ì´ ê³µì‹ = 0.5 * (ì¤‘ë ¥ê°€ì†ë„) * (ê²½ê³¼ ì‹œê°„) ^ 2
+
+        system("cls");
+        elapsedTime += 0.4; // ê²½ê³¼ ì‹œê°„ ì¦ê°€
+    }
+}
+
+void SimulateBouncing(float gravity, float restitution) {
+    int height = GRAVITY_CONSOLE_HEIGHT - 2;
+    float elapsedTime = 1.0; // ì´ˆê¸° ê²½ê³¼ ì‹œê°„ (ms -> s)
+    
+    do {
+        GotoXY(X_CENTER, height - 3);
+        printf("â—");
+        Sleep((int)(100 * pow(elapsedTime,2) / sqrtf(gravity))); // ê³µì´ ì˜¬ë¼ê°€ë©´ì„œ ê³µì˜ ì¶œë ¥ ì‹œê°„ ì¤„ì–´ë“¦
+
+        Velocity += gravity * elapsedTime; // ì†ë„ ê°±ì‹ 
+        height = (int)(height - Velocity * elapsedTime + 0.5 * gravity * powf(elapsedTime, 2) * visualScaleFactor); // ê³µì˜ ë†’ì´ ê³µì‹ = ì´ˆê¸° ë†’ì´ - (ì´ˆê¸° ì†ë„ * ê²½ê³¼ ì‹œê°„) + 0.5 * (ì¤‘ë ¥ê°€ì†ë„) * (ê²½ê³¼ ì‹œê°„) ^ 2
+        
+        if (height >= GRAVITY_CONSOLE_HEIGHT - 2) {
+            // ë°”ë‹¥ì— ë‹¿ìœ¼ë©´ ë°˜ë°œ
+            Velocity *= -restitution; // (ë°˜ë°œ ì§í›„ ì†ë„) = (ë•…ì— ë‹¿ê¸° ì§ì „ ì†ë„) * (ë°˜ë°œê³„ìˆ˜) 
+            elapsedTime = 0;
         }
 
         system("cls");
-    }
-
-    GotoXY(XPOS, MAX_CONSOLE_HEIGHT - 1);
-    printf("¡Ü\n");
-    Sleep(1000); // ¸¶Áö¸· À§Ä¡¿¡¼­ 1ÃÊ°£ ´ë±â
-
-    printf("Áß·Â ½Ã¹Ä·¹ÀÌ¼Ç Á¾·á\n");
+        elapsedTime += 0.4; // ê²½ê³¼ ì‹œê°„ ì¦ê°€
+    } while (height < GRAVITY_CONSOLE_HEIGHT - 3);
     Sleep(1000);
-    system("cls");
 }
+
 
 void GraphPlotting() {
     char equation[100];
-    printf("ÀÏÂ÷¹æÁ¤½ÄÀ» ÀÔ·ÂÇÏ¼¼¿ä (¿¹: 2*x + 3): y = ");
+    printf("ì¼ì°¨ë°©ì •ì‹ì„ ì…ë ¥í•˜ì„¸ìš” (ì˜ˆ: 2*x + 3): y = ");
     fgets(equation, sizeof(equation), stdin);
 
-    // °³Çà ¹®ÀÚ Á¦°Å
+    // ê°œí–‰ ë¬¸ì ì œê±°
     equation[strcspn(equation, "\n")] = '\0';
 
-    // ±×·¡ÇÁ Ãâ·Â
+    // ê·¸ë˜í”„ ì¶œë ¥
     for (int y = 10; y >= -10; y--) {
         for (int x = -10; x <= 10; x++) {
             if (y == 0 && x == 0) {
-                printf("+");  // ¿øÁ¡
+                printf("+");  // ì›ì 
             }
             else if (y == 0) {
-                printf("-");  // xÃà
+                printf("-");  // xì¶•
             }
             else if (x == 0) {
-                printf("|");  // yÃà
+                printf("|");  // yì¶•
             }
             else {
-                float result = evaluateExpression(x, equation);
+                float result = Equation(x, equation);
                 if (result > y - 0.5 && result < y + 0.5) {
-                    printf("o");  // ¹æÁ¤½Ä¿¡ ÇØ´çÇÏ´Â Á¡
+                    printf("o");  // ë°©ì •ì‹ì— í•´ë‹¹í•˜ëŠ” ì 
                 }
                 else {
                     printf(" ");
@@ -174,10 +226,22 @@ void GraphPlotting() {
         printf("\n");
     }
 
-    return 0;
-
-    printf("±×·¡ÇÁ ±×¸®±â Á¾·á\n");
+    printf("ê·¸ë˜í”„ ê·¸ë¦¬ê¸° ì¢…ë£Œ\n");
     Sleep(1000);
+    system("cls");
+}
+
+// ì£¼ì–´ì§„ x ê°’ì— ëŒ€í•œ ì‹ì˜ ê²°ê³¼ ê³„ì‚°
+float Equation(float x, char* expression) {
+    sscanf(expression, "%*[^0123456789.]%f", &x);
+    return x;
+}
+
+void ExceptionHandling(int line) {
+    PrintCentered("â”Œ--------------------------â”\n", 70, line);
+    PrintCentered("â”‚     ë‹¤ì‹œ ì…ë ¥í•´ì£¼ì„¸ìš”    â”‚\n", MAIN_WIDTH, line + 1);
+    PrintCentered("â””--------------------------â”˜\n", MAIN_WIDTH, line + 2);
+    Sleep(1500);
     system("cls");
 }
 
@@ -197,6 +261,7 @@ void CursorView(char show) {
 }
 
 void PrintCentered(const char* text, int width, int y) {
+    int textLength = strlen(text);
     int padding = (width - strlen(text)) / 2;
     GotoXY(padding, y);
     printf("%s", text);
@@ -209,8 +274,3 @@ void GotoXY(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
 }
 
-// ÁÖ¾îÁø x °ª¿¡ ´ëÇÑ ½ÄÀÇ °á°ú °è»ê
-float evaluateExpression(float x, char* expression) {
-    sscanf(expression, "%*[^0123456789.]%f", &x);
-    return x;
-}
